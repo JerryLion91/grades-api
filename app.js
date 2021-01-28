@@ -10,7 +10,9 @@ import { db } from './models/index.js';
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
+    console.log('Conected to Mongo');
   } catch (error) {
+    console.log('Error' + error);
     process.exit();
   }
 })();
