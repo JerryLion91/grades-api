@@ -3,8 +3,10 @@ import { logger } from '../config/logger.js';
 
 const create = async (req, res) => {
   try {
+    const newGrade = new db.gradeModel(req.body);
+    await newGrade.save();
     res.send({ message: 'Grade inserido com sucesso' });
-    logger.info(`POST /grade - ${JSON.stringify()}`);
+    logger.info(`POST /grade - ${JSON.stringify(newGrade)}`);
   } catch (error) {
     res
       .status(500)
@@ -20,8 +22,9 @@ const findAll = async (req, res) => {
   var condition = name
     ? { name: { $regex: new RegExp(name), $options: 'i' } }
     : {};
-
   try {
+    const grades = await db.gradeModel.find(condition);
+    res.send(grades);
     logger.info(`GET /grade`);
   } catch (error) {
     res
@@ -33,8 +36,10 @@ const findAll = async (req, res) => {
 
 const findOne = async (req, res) => {
   const id = req.params.id;
-
   try {
+    const grade = await db.gradeModel.find({ _id: id });
+    logger.info(grade);
+    res.send(grade);
     logger.info(`GET /grade - ${id}`);
   } catch (error) {
     res.status(500).send({ message: 'Erro ao buscar o Grade id: ' + id });
@@ -52,6 +57,11 @@ const update = async (req, res) => {
   const id = req.params.id;
 
   try {
+    const grade = await db.gradeModel.findByIdAndUpdate(id, req.body, {
+      new: true,
+      useFindAndModify: false,
+    });
+    res.send(grade);
     logger.info(`PUT /grade - ${id} - ${JSON.stringify(req.body)}`);
   } catch (error) {
     res.status(500).send({ message: 'Erro ao atualizar a Grade id: ' + id });
@@ -63,7 +73,9 @@ const remove = async (req, res) => {
   const id = req.params.id;
 
   try {
+    await db.gradeModel.findOneAndDelete({ _id: id });
     logger.info(`DELETE /grade - ${id}`);
+    res.end();
   } catch (error) {
     res
       .status(500)
@@ -74,7 +86,9 @@ const remove = async (req, res) => {
 
 const removeAll = async (req, res) => {
   try {
+    const grades = await db.gradeModel.deleteMany({});
     logger.info(`DELETE /grade`);
+    res.end();
   } catch (error) {
     res.status(500).send({ message: 'Erro ao excluir todos as Grades' });
     logger.error(`DELETE /grade - ${JSON.stringify(error.message)}`);

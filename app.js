@@ -1,8 +1,11 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import dotenv from 'dotenv';
+dotenv.config();
 
 import { db } from './models/index.js';
+import { gradeRouter } from './routes/gradeRouter.js';
 
 (async () => {
   try {
@@ -24,11 +27,13 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: 'http://localhost:8080',
+    origin: 'http://localhost:3000',
   })
 );
+app.use('/', gradeRouter);
 
 app.get('/', (req, res) => {
+  console.log('API em execucao');
   res.send('API em execucao');
 });
 
